@@ -11,53 +11,61 @@ import DigitButton from './digitButton'
 import OperatorButton from './operatorButton'
 
 const initialState = {
-    curr: 0,
-    prev: 0,
+    current: 0,
+    previous: 0,
     operation: '',
 };
 
+function reducer(state: CountState, action: Action): CountState {
 
-function reducer(state: COUNTSTATE, { type, payload }: COUNTACTIONS) {
-    switch (type) {
-        case ACTIONS.ADD_DIGIT:
-            if (payload.digit === 0 && state.curr === 0) return state
+    switch (action.type) {
+        //for digit button
+        case Actions.AddDigit:
+            //start with zero
+            if (action.payload.digit === 0 && state.current === 0) return state
             return {
                 ...state,
-                curr: `${state.curr || ""}${payload.digit}`
+                current: Number(`${state.current || ""}${action.payload.digit}`)
             };
-        case ACTIONS.CHOOSE_OPERATOR:
-            if (state.curr == null && state.prev == null) return state
-            if (state.curr == null) {
+
+        //for operation button
+        case Actions.chooseOperator:
+            if (state.current == null && state.previous == null) return state
+            if (state.current == null) {
                 return {
                     ...state,
-                    operation: payload.operation,
+                    operation: action.payload.operation,
                 }
             }
-            if (state.prev == null) {
+            if (state.previous == null) {
                 return {
                     ...state,
-                    operation: payload.operation,
-                    prev: state.curr,
-                    curr: null,
+                    operation: action.payload.operation,
+                    previous: state.current,
+                    current: 0,
                 }
             }
             return {
                 ...state,
-                prev: evaluate(state),
-                operation: payload.operation,
-                curr: null
+                previous: Number(evaluate(state)),
+                operation: action.payload.operation,
+                current: 0
             }
-        case ACTIONS.CLEAR:
-            return {}
-        case ACTIONS.EVALUATE:
-            if (state.operation == null || state.curr == null || state.prev == null) {
+
+        //for AC button
+        case Actions.clear:
+            return initialState
+
+        //for = button
+        case Actions.evaluate:
+            if (state.operation == null || state.current == null || state.previous == null) {
                 return state
             }
             return {
                 ...state,
-                prev: null,
-                operation: null,
-                curr: evaluate(state)
+                previous: 0,
+                operation: '',
+                current: Number(evaluate(state))
             }
 
         default:
@@ -65,22 +73,23 @@ function reducer(state: COUNTSTATE, { type, payload }: COUNTACTIONS) {
     }
 }
 
-function evaluate({ curr, prev, operation }: COUNTSTATE) {
+//for =
+function evaluate({ current, previous, operation }: CountState) {
 
-    if (isNaN(prev) || isNaN(curr)) return ""
+    if (isNaN(previous) || isNaN(current)) return ""
     let computation = 0
     switch (operation) {
         case "+":
-            computation = prev + curr
+            computation = previous + current
             break;
         case "-":
-            computation = prev - curr
+            computation = previous - current
             break;
         case "*":
-            computation = prev * curr
+            computation = previous * current
             break;
         case "/":
-            computation = prev / curr
+            computation = previous / current
             break;
     }
     return computation
@@ -94,7 +103,7 @@ export default function Calculator() {
     }
 
     //calculator
-    const [{ curr, prev, operation }, dispatch] = useReducer(reducer, initialState);
+    const [{ current, previous, operation }, dispatch] = useReducer(reducer, initialState);
 
     return <>
         <div className={lightMode ? cx(styles.lightcalculator, styles.calculator) : styles.calculator}>
@@ -102,13 +111,16 @@ export default function Calculator() {
                 {lightMode ? <FiSun className={styles.lighticon} /> : <FiMoon />}
             </section>
             <section className={styles.monitor}>
-                <p className={styles.prevmonitor}>{prev}{operation}</p>
-                <p>{curr}</p>
+                <p className={styles.prevmonitor}>{previous}{operation}</p>
+                <p>{current}</p>
             </section>
             <section className={styles.calcbtnContainer}>
-                <button onClick={() => dispatch({ type: ACTIONS.CLEAR)} className={lightMode ? styles.btnyellow : styles.btngrey}>AC</button>
+                <button onClick={() => dispatch({ type: Actions.clear })}
+                    className={lightMode ? styles.btnyellow : styles.btngrey}>AC
+                </button>
+                <button onClick={() => dispatch({ type: Actions.deleteDigit })}
+                    className={lightMode ? styles.btnyellow : styles.btngrey}>DEL</button>
                 <button className={lightMode ? styles.btnyellow : styles.btngrey}>-/+</button>
-                <button className={lightMode ? styles.btnyellow : styles.btngrey}>%</button>
                 <OperatorButton dispatch={dispatch} operator={'/'} lightMode={lightMode} />
                 <DigitButton dispatch={dispatch} digit={7} lightMode={lightMode} />
                 <DigitButton dispatch={dispatch} digit={8} lightMode={lightMode} />
@@ -124,7 +136,8 @@ export default function Calculator() {
                 <OperatorButton dispatch={dispatch} operator={'+'} lightMode={lightMode} />
                 <DigitButton dispatch={dispatch} digit={0} lightMode={lightMode} />
                 <button className={cx(lightMode ? styles.btnred : styles.btndavygrey, styles.btndot)}>.</button>
-                <button onClick={() => dispatch({ type: ACTIONS.EVALUATE })} className={lightMode ? cx(styles.btntotallight, styles.btntotal) : styles.btntotal}>=</button>
+                <button onClick={() => dispatch({ type: Actions.evaluate })}
+                    className={lightMode ? cx(styles.btntotallight, styles.btntotal) : styles.btntotal}>=</button>
             </section>
         </div>
     </>

@@ -7,7 +7,7 @@ export default function OperatorButton({ dispatch, operator, lightMode }: OPERAT
 
     return <>
         <button className={lightMode ? styles.btnyellow : styles.btngrey}
-            onClick={() => dispatch({ type: ACTIONS.CHOOSE_OPERATOR, payload: { operator } })}>
+            onClick={() => dispatch({ type: Actions.chooseOperator, payload: { operator } })}>
             {operator}
         </button>
     </>

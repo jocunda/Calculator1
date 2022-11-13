@@ -1,34 +1,47 @@
-enum ACTIONS {
-    ADD_DIGIT = 'add-digit',
-    CHOOSE_OPERATOR = 'choose-operation',
-    CLEAR = 'clear',
-    DELETE_DIGIT = 'delete-digit',
-    EVALUATE = 'evaluate',
-}
-// An interface for our actions
-interface COUNTACTIONS {
-    type: ACTIONS;
-    payload: {
-        digit: number
-        operation: string
-    };
+enum Actions {
+    AddDigit = 'add-digit',
+    chooseOperator = 'choose-operation',
+    clear = 'clear',
+    deleteDigit = 'delete-digit',
+    evaluate = 'evaluate',
 }
 
+// An interface for our actions 
+type Action = {
+    type: Actions.AddDigit;
+    payload: {
+        digit: number
+    };
+} | {
+    type: Actions.chooseOperator;
+    payload: {
+        operation: string
+    };
+} | {
+    type: Actions.clear;
+} | {
+    type: Actions.deleteDigit;
+}
+    | {
+        type: Actions.evaluate;
+    };
+
 // An interface for our state
-interface COUNTSTATE {
-    curr: number
-    prev: number
+interface CountState {
+    current: number
+    previous: number
     operation: string
 }
 
+
 type OPERATORTYPE = {
-    dispatch: any
+    dispatch: Dispatch<Action>
     operator: string
     lightMode: boolean
 }
 
 type DIGITTYPE = {
-    dispatch: any
+    dispatch: Dispatch<Action>
     digit: number
     lightMode: boolean
 }

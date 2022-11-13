@@ -1,10 +1,12 @@
-import React, { createContext, useState } from "react"
+import React, { createContext, useState, Dispatch } from "react"
 
 const initalLightModeContextValue = {
     lightMode: false,
-    toogleLightMode: () => { }
+    toogleLightMode: () => { },
+
 }
 const LightModeContext = createContext<{
+
     lightMode: boolean;
     toogleLightMode: () => void;
 }>(initalLightModeContextValue);
